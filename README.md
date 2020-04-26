@@ -1,5 +1,5 @@
 # UnityPackage-Extractor
-Extract files from unityPackage
+Extract files from unityPackage by Node.js
 
 For use just write
 ~~~~

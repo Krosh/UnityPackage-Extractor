@@ -17,7 +17,7 @@ async function lsWithGrep() {
                 const assetFilePath = await (await fs.promises.readFile(__dirname + path.sep + dir + path.sep + 'pathname')).toString()
                 const assetDirectory = __dirname + path.sep + path.dirname(assetFilePath)
                 await fs.promises.mkdir(assetDirectory, { recursive: true });
-                await fs.promises.copyFile(__dirname + path.sep + dir + path.sep + 'asset', assetDirectory + path.basename(assetFilePath))
+                await fs.promises.copyFile(__dirname + path.sep + dir + path.sep + 'asset', assetDirectory + path.sep + path.basename(assetFilePath))
             })
     } catch (err) {
         console.error(err);

@@ -5,12 +5,15 @@ const path = require('path')
 
 async function lsWithGrep() {
     try {
+        const alreadyExistedDirs = (await fs.promises.readdir(__dirname)).filter(source => {
+            return fs.lstatSync(source).isDirectory()
+        })
         await exec('tar zxf ' + process.argv[2]);
-        (await fs.promises.readdir(__dirname))
+        await Promise.all((await fs.promises.readdir(__dirname))
             .filter(source => {
                 return fs.lstatSync(source).isDirectory()
             })
-            .forEach(async dir => {
+            .map(async dir => {
                 if (!fs.existsSync(__dirname + path.sep + dir + path.sep + 'asset')) {
                     return
                 }
@@ -19,8 +22,14 @@ async function lsWithGrep() {
                     .split(/\r?\n/)[0]
                 const assetDirectory = __dirname + path.sep + path.dirname(assetFilePath)
                 await fs.promises.mkdir(assetDirectory, { recursive: true });
-                await fs.promises.copyFile(__dirname + path.sep + dir + path.sep + 'asset', assetDirectory + path.sep + path.basename(assetFilePath))
+                return fs.promises.copyFile(__dirname + path.sep + dir + path.sep + 'asset', assetDirectory + path.sep + path.basename(assetFilePath))
+            }))
+        const newDirs = (await fs.promises.readdir(__dirname))
+            .filter(source => {
+                return fs.lstatSync(source).isDirectory()
             })
+            .filter(dir => !alreadyExistedDirs.includes(dir) && !dir.startsWith('Asset'))
+        newDirs.forEach(dir => fs.rmdirSync(dir, { recursive: true }))
     } catch (err) {
         console.error(err);
     };
